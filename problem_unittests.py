@@ -151,7 +151,7 @@ def test_tokenize(token_lookup):
 
 def test_get_inputs(get_inputs):
     with tf.Graph().as_default():
-        input_data, targets, lr = get_inputs()
+        input_data, targets, lr, keep_pr = get_inputs()
 
         # Check type
         assert input_data.op.type == 'Placeholder',\
@@ -160,6 +160,8 @@ def test_get_inputs(get_inputs):
             'Targets not a Placeholder.'
         assert lr.op.type == 'Placeholder',\
             'Learning Rate not a Placeholder.'
+        assert keep_pr.op.type == 'Placeholder',\
+            'Keep_prob not a Placeholder.'
 
         # Check name
         assert input_data.name == 'input:0',\
@@ -169,6 +171,7 @@ def test_get_inputs(get_inputs):
         input_rank = 0 if input_data.get_shape() == None else len(input_data.get_shape())
         targets_rank = 0 if targets.get_shape() == None else len(targets.get_shape())
         lr_rank = 0 if lr.get_shape() == None else len(lr.get_shape())
+        keep_pr_rank = 0 if keep_pr.get_shape() == None else len(keep_pr.get_shape())
 
         assert input_rank == 2,\
             'Input has wrong rank.  Rank {} found.'.format(input_rank)
@@ -184,8 +187,9 @@ def test_get_init_cell(get_init_cell):
     with tf.Graph().as_default():
         test_batch_size_ph = tf.placeholder(tf.int32, [])
         test_rnn_size = 256
+        test_keep_prob = tf.placeholder(tf.float32, [])
 
-        cell, init_state = get_init_cell(test_batch_size_ph, test_rnn_size)
+        cell, init_state = get_init_cell(test_batch_size_ph, test_rnn_size, test_keep_prob)
 
         # Check type
         assert isinstance(cell, tf.contrib.rnn.MultiRNNCell),\
